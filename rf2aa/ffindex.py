@@ -44,10 +44,11 @@ def get_entry_by_name(name, index):
 
 
 def read_entry_lines(entry, data):
+    # slice the memory-mapped file `data` using data[start:end] syntax, then decode by utf-8 and split by newline char.
     lines = data[entry.offset:entry.offset + entry.length - 1].decode("utf-8").split("\n")
     return lines
 
-
+# similar to the command above. But it returns the byte slice, instead of Strings in UTF-8 encoding. 
 def read_entry_data(entry, data):
     return data[entry.offset:entry.offset + entry.length - 1]
 
