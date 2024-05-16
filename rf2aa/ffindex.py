@@ -9,12 +9,11 @@ Created on Apr 30, 2014
 
 
 import sys
-import mmap
+import mmap    # mmap: Memory-mapped file objects allow Python to access the content of a file directly in memory, which is useful for efficient file reading and writing.
 from collections import namedtuple
 
+# It is like initiating a class named FFindexEntry in java, with name, offset, and length as its build-in variables. FFindexEntry ffentry = new FFindexEntry(String name, Object offset, int length); 
 FFindexEntry = namedtuple("FFindexEntry", "name, offset, length")
-
-
 def read_index(ffindex_filename):
     entries = []
     
@@ -26,9 +25,11 @@ def read_index(ffindex_filename):
     
     return entries
 
-
+# Similar to Java NIO package. It can access particular position more efficiently without opening the whole file in to memory. 
 def read_data(ffdata_filename):
+    # rb means read the file in binary read mode. 
     fh = open(ffdata_filename, "rb")
+    # fh.fileno() retrieves file descriptor from the file handle (an integer). 0 indicates teh size of the mapping. setting to 0 means the entire file will be mapped. 
     data = mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ)
     fh.close()
     return data
