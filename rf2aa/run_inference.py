@@ -1,19 +1,27 @@
 import os
-import hydra
+import hydra        # for configuration
 import torch
 import torch.nn as nn
 from dataclasses import asdict
 
+# from rf2aa.data
 from rf2aa.data.merge_inputs import merge_all
 from rf2aa.data.covale import load_covalent_molecules
 from rf2aa.data.nucleic_acid import load_nucleic_acid
 from rf2aa.data.protein import generate_msa_and_load_protein
 from rf2aa.data.small_molecule import load_small_molecule
+
+# The ffindex.py script is designed to handle FFindex databases, which are used for storing large numbers of small data entries efficiently in a single file system. This approach is often used in bioinformatics to manage large datasets such as protein databases.
 from rf2aa.ffindex import *
+
 from rf2aa.chemical import initialize_chemdata, load_pdb_ideal_sdf_strings
 from rf2aa.chemical import ChemicalData as ChemData
+
 from rf2aa.model.RoseTTAFoldModel import RoseTTAFoldModule
+
 from rf2aa.training.recycling import recycle_step_legacy
+
+
 from rf2aa.util import writepdb, is_atom, Ls_from_same_chain_2d
 from rf2aa.util_module import XYZConverter
 
