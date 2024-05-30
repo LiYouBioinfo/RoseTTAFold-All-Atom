@@ -23,14 +23,16 @@ def make_frame(X, Y):
 
 # ang between vectors
 def th_ang_v(ab,bc,eps:float=1e-8):
-    def th_norm(x,eps:float=1e-8):
-        return x.square().sum(-1,keepdim=True).add(eps).sqrt()
-    def th_N(x,alpha:float=0):
-        return x/th_norm(x).add(alpha)
-    ab, bc = th_N(ab),th_N(bc)
-    cos_angle = torch.clamp( (ab*bc).sum(-1), -1, 1)
-    sin_angle = torch.sqrt(1-cos_angle.square() + eps)
-    dih = torch.stack((cos_angle,sin_angle),-1)
+    def th_norm(x,eps:float=1e-8):    # return the norm of the tensor. 
+        return x.square().sum(-1,keepdim=True).add(eps).sqrt()    # for each vector (dim=-1), calculate the sum square root. Add eps to avoid dividing by zero. This is L2 norm.
+    def th_N(x,alpha:float=0):        # normalize the vector
+        return x/th_norm(x).add(alpha)    # Normalize vectors in tensor by dividing the original values by their L2 norms.
+    ab, bc = th_N(ab),th_N(bc)    # normalized vector ab and bc.
+    cos_angle = torch.clamp( (ab*bc).sum(-1), -1, 1)    # calculate the cosine angle using formula ab·bc = |ab|*|bc|*cos. ab/|ab| is already calculated in th_N(ab)
+    sin_angle = torch.sqrt(1-cos_angle.square() + eps)    # sin = sqrt(1-cos^2)
+    dih = torch.stack((cos_angle,sin_angle),-1)    # stack cos_angle and sin_angle into a vector
+
+    ## Please note that calculating (ab*bc).sum(-1) instead of torch.dot(ab, bc) is because 1. Flexibility with Batch Processing, and 2. Dimensionality and Broadcasting. The torch.dot function specifically requires 1D input tensors and will return a scalar. 
     return dih
 
 # dihedral between vectors
