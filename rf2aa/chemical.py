@@ -32,25 +32,26 @@ def th_ang_v(ab,bc,eps:float=1e-8):
     sin_angle = torch.sqrt(1-cos_angle.square() + eps)    # sin = sqrt(1-cos^2)
     dih = torch.stack((cos_angle,sin_angle),-1)    # stack cos_angle and sin_angle into a vector
 
-    ## Please note that calculating (ab*bc).sum(-1) instead of torch.dot(ab, bc) is because 1. Flexibility with Batch Processing, and 2. Dimensionality and Broadcasting. The torch.dot function specifically requires 1D input tensors and will return a scalar. 
+    ## Please note that calculating (ab*bc).sum(-1) instead of torch.dot(ab, bc) is because 1. Flexibility with Batch Processing, 
+    ## and 2. Dimensionality and Broadcasting. The torch.dot function specifically requires 1D input tensors and will return a scalar. 
     return dih
 
 # dihedral between vectors
 def th_dih_v(ab,bc,cd):
-    def th_cross(a,b):
-        a,b = torch.broadcast_tensors(a,b)
-        return torch.cross(a,b, dim=-1)
+    def th_cross(a,b):    # cross product between two vectors to get perpendicular vector to a-b plane. 
+        a,b = torch.broadcast_tensors(a,b)    # broadcast the vector first
+        return torch.cross(a,b, dim=-1)       # return the perpendicular vector to a-b plane using cross product. 
     def th_norm(x,eps:float=1e-8):
-        return x.square().sum(-1,keepdim=True).add(eps).sqrt()
-    def th_N(x,alpha:float=0):
-        return x/th_norm(x).add(alpha)
+        return x.square().sum(-1,keepdim=True).add(eps).sqrt()        # return L2 norm
+    def th_N(x,alpha:float=0):   
+        return x/th_norm(x).add(alpha)        # return normalized vector
 
-    ab, bc, cd = th_N(ab),th_N(bc),th_N(cd)
-    n1 = th_N( th_cross(ab,bc) )
-    n2 = th_N( th_cross(bc,cd) )
-    sin_angle = (th_cross(n1,bc)*n2).sum(-1)
-    cos_angle = (n1*n2).sum(-1)
-    dih = torch.stack((cos_angle,sin_angle),-1)
+    ab, bc, cd = th_N(ab),th_N(bc),th_N(cd)    # Normalized vector ab, bc, and cd (a,b,c,d could be the index name for connected atoms)
+    n1 = th_N( th_cross(ab,bc) )               # get perpendicular vector to ab-bc plane.
+    n2 = th_N( th_cross(bc,cd) )               # get perpendicular vector to bc-cd plane.
+    sin_angle = (th_cross(n1,bc)*n2).sum(-1)   # similar to th_ang_v
+    cos_angle = (n1*n2).sum(-1)                # similar to th_ang_v
+    dih = torch.stack((cos_angle,sin_angle),-1)    # similar to th_ang_v
     return dih
 
 # dihedral between points
