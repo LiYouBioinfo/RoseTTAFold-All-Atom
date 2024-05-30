@@ -14,12 +14,12 @@ from rf2aa.scoring import *
 
 # process ideal frames
 def make_frame(X, Y):
-    Xn = X / torch.linalg.norm(X)
-    Y = Y - torch.dot(Y, Xn) * Xn
-    Yn = Y / torch.linalg.norm(Y)
-    Z = torch.cross(Xn,Yn)
-    Zn =  Z / torch.linalg.norm(Z)
-    return torch.stack((Xn,Yn,Zn), dim=-1)
+    Xn = X / torch.linalg.norm(X)    # calculate the basis vector of X
+    Y = Y - torch.dot(Y, Xn) * Xn    # Project Y on Xn to get the portion of Y on Xn direction (torch.dot(Y, Xn)), multiply Xn to get the actual length of Y on Xn (* Xn). Remove this part to get new Y. 
+    Yn = Y / torch.linalg.norm(Y)    # calculate the basis vector of Y for new Y.
+    Z = torch.cross(Xn,Yn)           # get the z vector that is orthogonal to both Xn and Yn (with right hand rule) using cross product.
+    Zn =  Z / torch.linalg.norm(Z)   # get the basis vector of Z
+    return torch.stack((Xn,Yn,Zn), dim=-1)    # stack Xn, Yn, Zn to create this new matrix (coordinate system).
 
 # ang between vectors
 def th_ang_v(ab,bc,eps:float=1e-8):
